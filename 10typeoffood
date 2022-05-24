@@ -1,0 +1,73 @@
+import numpy as np
+import os
+from keras.models import Sequential
+from keras.layers import Dense, Conv2D
+from keras.layers import Dropout
+from keras.layers import Flatten
+from keras.constraints import maxnorm
+from tensorflow.keras.optimizers import Adam
+from keras.layers.convolutional import Convolution2D
+from keras.layers.convolutional import MaxPooling2D
+from keras.callbacks import ModelCheckpoint, LearningRateScheduler
+from keras.callbacks import ReduceLROnPlateau
+from keras.callbacks import EarlyStopping
+from keras.utils import np_utils
+import matplotlib.pyplot as plt
+from keras.preprocessing.image import ImageDataGenerator
+from google.colab import drive
+drive.mount('/content/drive')
+x_train= '/content/drive/MyDrive/FOOD/x_train'
+x_test= '/content/drive/MyDrive/FOOD/x_test'
+x_train = ImageDataGenerator(rescale=1/255)
+x_test = ImageDataGenerator(rescale=1/255)
+x_train_data = x_train.flow_from_directory(
+directory=r"/content/drive/MyDrive/FOOD/x_train",
+target_size=(224, 224),
+batch_size=3,
+class_mode='categorical',
+)
+x_test_data = x_test.flow_from_directory(
+directory=r"/content/drive/MyDrive/FOOD/x_test",
+target_size=(224, 224),
+batch_size=3,
+class_mode= "categorical",
+)x_train_data.class_indices
+model = Sequential()
+model.add(Conv2D(32,(3,3),input_shape=(224,224,3),padding='same',activation='relu'))
+model.add(Dropout(0.2))
+model.add(Conv2D(32,(3,3),activation='relu',padding='same'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(64,(3,3),activation='relu',padding='same'))
+model.add(Dropout(0.2))
+model.add(Conv2D(64,(3,3),activation='relu',padding='same'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(128,(3,3),activation='relu',padding='same'))
+model.add(Dropout(0.2))
+model.add(Conv2D(128,(3,3),activation='relu',padding='same'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Flatten())
+model.add(Dropout(0.2))
+model.add(Dense(512,activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(218,activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(100 ,activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(10,activation='softmax'))
+model.summary()
+from tensorflow.keras.optimizers import SGD
+#opt = SGD(lr = 0.01, momentum= 0.9)
+model.compile(optimizer=Adam(learning_rate=0.0005), loss='categorical_crossentropy', metri
+history=model.fit(x_train_data,
+epochs=1,
+batch_size=32,
+verbose=1,
+validation_data= x_test_data)
+model.save('10loaithucan.h5')
+from keras.models import load_model
+nhandangthucan = load_model('10loaithucan.h5')
+model.save('10loaithucan.h5')
+from keras.models import load_model
+nhandangthucan = load_model('10loaithucan.h5')
+np.argmax(nhandangthucan.predict(img),axis= 1)
+
